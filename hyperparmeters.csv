@@ -1,0 +1,14 @@
+Gray_Customization
+red_weight = 0.050
+green_weight = 0.900
+blue_weight = 0.050
+
+
+mask_iteration
+padding = 10
+
+mask_creation
+connectivity = 8
+min_area = 1000
+
+square_size = 300

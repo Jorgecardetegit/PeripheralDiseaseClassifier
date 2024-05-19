@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Peripheral Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='image-preview.js') }}" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container-header">
+            <img src="{{ url_for('static', filename='Logo.png') }}" alt="Logo" class="header-logo">
+            <h1>Peripheral Classifier</h1>
+        </div>
+    </header>
+
+    <div class="classification-sidebar">
+        <h2>Types of diseases</h2>
+        <ul>
+            <li>1 - Chronic lymphocytic leukemia (CLL)</li>
+            <li>2 - Tricholeukemia</li>
+            <li>3 - Acute lymphoblastic leukemia (ALL)</li>
+            <li>4 - Follicular lymphoma</li>
+            <li>5 - Marginal lymphoma</li>
+            <li>6 - Mononucleosis</li>
+            <li>7 - Normal</li>
+        </ul>
+    </div>
+
+    <div class="images-and-info-container">
+        <div class="container">
+            <div class="inference-api">⛈️ Inference API</div>
+            <div id="drop-area">
+                <form class="my-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                    <input type="file" id="fileElem" name="image" accept="image/*" style="display: none;" onchange="handleFiles(this.files)">
+                    <label for="fileElem" id="drop-label">
+                        <p>Drag image file here or click to browse from your device</p>
+                    </label>
+                </form>
+            </div>
+            <!-- Checkboxes with labels -->
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="classifications" name="classifications">
+                    Classifications
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="locations" name="locations">
+                    Locations
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="mask" name="mask">
+                    Mask
+                </label>
+            </div>
+            <!-- Position the processed image container right after the drop area -->
+            <div id="processed-image-container"></div>
+
+            <!-- Container for displaying extracted cell images -->
+            <div id="cells-display" style="margin-top: 20px;"></div>
+        </div>
+
+        <div class="table-container">
+            <table id="cells-info-table">
+              <thead>
+                <tr>
+                  <th>nº cells detected</th>
+                  <th>Disease</th>
+                  <th>Confidence</th>
+                </tr>
+              </thead>
+              <tbody id="cells-info-body">
+                <!-- Dynamic rows will be inserted here -->
+              </tbody>
+            </table>
+        </div>
+    <div class="separator-line-fixed"></div>
+
+
+    <script src="{{ url_for('static', filename='image-preview.js') }}" defer></script>
+</body>
+</html>

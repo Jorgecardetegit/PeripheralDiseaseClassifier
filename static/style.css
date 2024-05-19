@@ -1,0 +1,236 @@
+/* Reset margins and padding for a consistent start */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif; /* Use a common font stack */
+}
+
+.site-header {
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Adjusted to space-between for better alignment */
+    padding: 10px 20px;
+}
+
+.container-header {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    height: 50px;
+    margin-right: 20px;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+.classification-sidebar {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25%;
+    padding: 20px;
+    padding-left: 30px;
+    padding-top: 40px;
+    z-index: 15;
+}
+
+.classification-sidebar h2 {
+    margin-bottom: 10px;
+}
+
+.classification-sidebar ul {
+    list-style-type: none;
+}
+
+.classification-sidebar li {
+    padding: 10px 0;
+    background-image: linear-gradient(to right, #000 33%, rgba(255, 255, 255, 0) 0%);
+    background-position: 0 100%;
+    background-size: 300% 1px;
+    background-repeat: no-repeat;
+    padding-left: 50px; /* Adjust as needed for your layout */
+    text-align: left;;
+}
+/* Container that holds the main content */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center children horizontally */
+    margin-left: 20px;
+    position: relative; 
+}
+
+/* Infrence API styling */
+.inference-api {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Drop area styling */
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    width: 80%; /* Set a percentage width for responsiveness */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#drop-area .original-image {
+    width: 100%; /* Full width within the drop area */
+    max-width: 200px; /* Set a max width for the image */
+    height: auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#top-left-corner {
+    position: absolute; /* Keep it positioned absolutely within the container */
+    left: 150px; /* Adjust as necessary for spacing from the left edge of the container */
+    top: 230px; /* Increase the top property value to move it below the Inference API text */
+    width: auto; /* Or set a specific width if needed */
+    max-width: 500%; /* This will limit the image width to 30% of the container's width */
+}
+
+#top-left-corner img {
+    width: 100%; /* This will make the image take up 100% of the #top-left-corner width */
+    height: auto; /* This will maintain the image's aspect ratio */
+}
+
+.container {
+    position: relative; /* This makes the absolute positioning of children relative to this container */
+    /* Other styles remain unchanged */
+}
+
+.site-header {
+    position: relative; /* Needed for z-index to take effect */
+    z-index: 10; /* Higher than the z-index (if any) of #top-left-corner */
+}
+
+/* Style for checkboxes */
+.options {
+    display: flex;
+    justify-content: center; /* Center checkbox options */
+    gap: 20px; /* Add space between options */
+}
+
+#processed-image-container {
+    width: 35%; /* Adjust width as needed */
+    margin-top: 40px; /* Space from the drop area */
+    text-align: left; /* Align the image to the left within the container */
+    display: flex; /* Use flexbox to align content */
+    justify-content: flex-start; /* Align children to the start of the container */
+    align-items: flex-start; /* Ensure items align to the top, removing any centering */
+    padding-left: 0; /* Remove any padding that might push content towards the center */
+    overflow: hidden; /* Ensures that no overflow content affects layout */
+    padding-bottom: 10px; 
+}
+
+.uploaded-image {
+    max-width: 100%; /* This ensures the image is responsive and fits within its container */
+    height: auto; /* This maintains the aspect ratio */
+    margin-right: auto; /* Pushes the image to the left if there's extra space in the container */
+}
+
+#cells-display {
+    display: grid; /* This will lay out the child elements in a grid */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjust '100px' to the desired size of the cells */
+    grid-gap: 80px; /* This is the space between the cells */
+    justify-content: left; /* This will center the grid within the cells-display container */
+    align-items: left; /* This will vertically align the cells */
+    margin-top: 20px; /* Maintain the existing top margin */
+    padding-top: 10px; 
+}
+
+.uploaded-cell-image {
+    width: 100%; /* This will make the image responsive within the grid cell */
+    height: auto; /* This will maintain the image's aspect ratio */
+    display: block; /* This ensures that the image is a block-level element */
+    margin: 0 auto; /* This centers the image within its grid cell if necessary */
+}
+
+.separator-line {
+    position: absolute;
+    top: 90%; /* Adjust this value to place the line at the desired position vertically */
+    left: 0;
+    right: 0;
+    border-top: 2px solid #cccccc; /* Creates the line */
+    z-index: 10; /* Ensures the line is above other elements */
+}
+
+.separator-line-fixed {
+    position: absolute; /* Fixed positioning relative to the viewport */
+    left: 0;
+    right: 0;
+    top: 95%; /* Position at half the height of the viewport */
+    border-top: 2px solid #000; /* Solid line, 2 pixels thick */
+    z-index: 999; /* Ensures the line is above other elements */
+}
+
+/* Container for the processed image and the cells info table */
+
+/* Style for the cells info table container */
+.table-container {
+    position: absolute;
+    top: 50%; /* Adjust as necessary to align vertically */
+    right: 0; /* Align to the right side */
+    transform: translateY(-50%); /* Center vertically */
+    width: 20%; /* Adjust the width as necessary */
+    padding: 10px;
+    text-align: center; /* Align text to the left within each cell */
+    z-index: 10; /* Ensure it's above other elements if needed */
+}
+/* Table styles */
+#cells-info-table {
+    width: 100%; /* The table will take the full width of its container */
+    /* Other table styles */
+}
+
+body {
+    background-image: url("C:/Users/JCardeteLl/Downloads/pexels-hngstrm-1939485.jpg");
+    background-size: cover; /* This will cover the entire visible area */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-attachment: fixed; /* The background is fixed with regard to the viewport */
+}
+
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .site-header {
+        justify-content: center; /* Center items in the header */
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    #drop-area {
+        width: 90%;
+    }
+
+    .options {
+        flex-direction: column; /* Stack options vertically on smaller screens */
+        align-items: center; /* Center align items */
+    }
+}
+
+/* Additional highlight class for drag over */
+.highlight {
+    border-color: blue;
+}
+
+

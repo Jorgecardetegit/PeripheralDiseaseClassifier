@@ -1,0 +1,315 @@
+document.addEventListener('DOMContentLoaded', function () {
+    var dropArea = document.getElementById('drop-area');
+
+    // Object to keep track of image data
+    var imageData = {};
+
+    // Add event listeners to checkboxes
+    document.getElementById('classifications').addEventListener('change', updateDisplayedImage);
+    document.getElementById('locations').addEventListener('change', updateDisplayedImage);
+    document.getElementById('mask').addEventListener('change', updateDisplayedImage);
+
+    // Function to create an image element
+    function createImageElement(src) {
+        var img = new Image();
+        img.src = `data:image/jpeg;base64,${src}`;
+        img.classList.add('uploaded-image'); // Add additional classes as necessary
+        return img;
+    }
+
+    // Function to update displayed image based on checkbox
+    function updateDisplayedImage() {
+        var processedImageContainer = document.getElementById('processed-image-container');
+        processedImageContainer.innerHTML = ''; // Clear the previous image
+    
+        var imgElement;
+    
+        // Determine which image to show based on checkboxes
+        var classificationsChecked = document.getElementById('classifications').checked;
+        var locationsChecked = document.getElementById('locations').checked;
+        var maskChecked = document.getElementById('mask').checked;
+    
+        // Check combinations and assign the appropriate image element
+        if (maskChecked) {
+            imgElement = createImageElement(imageData.mask);
+        } else if (classificationsChecked && locationsChecked) {
+            imgElement = createImageElement(imageData.processed_image);
+        } else if (classificationsChecked) {
+            imgElement = createImageElement(imageData.classification_image);
+        } else if (locationsChecked) {
+            imgElement = createImageElement(imageData.square_image);
+        } else {
+            // If no checkboxes are checked, show the original image
+            imgElement = createImageElement(imageData.original_image);
+        }
+    
+        // Append the chosen image element to the container
+        processedImageContainer.appendChild(imgElement);
+    }    
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    // Handle file selection via input
+    var fileInput = document.getElementById('fileElem');
+    fileInput.addEventListener('change', function (event) {
+        handleFiles(this.files);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropArea.classList.add('highlight');
+    }
+
+    function unhighlight(e) {
+        dropArea.classList.remove('highlight');
+    }
+
+    function handleDrop(e) {
+        var dt = e.dataTransfer;
+        var files = dt.files;
+        handleFiles(files);
+    }
+
+    function handleFiles(files) {
+        ([...files]).forEach(uploadFile);
+    }
+
+    function uploadFile(file) {
+        var formData = new FormData();
+        formData.append('image', file);
+
+        fetch('/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // expecting a JSON response
+        })
+        .then(data => {
+            // Store the received image data for later use
+            imageData.original_image = data.original_image;
+            imageData.processed_image = data.processed_image;
+            imageData.mask = data.mask;
+            imageData.square_image = data.square_image;
+            imageData.classification_image = data.classification_image;
+
+            // Display the original image by default
+            updateDisplayedImage();
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
+    }
+});
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Peripheral Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='image-preview.js') }}" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container-header">
+            <img src="{{ url_for('static', filename='Logo.png') }}" alt="Logo" class="header-logo">
+            <h1>Peripheral Classifier</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="inference-api">⛈️ Inference API</div>
+        <div id="drop-area">
+            <form class="my-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                <input type="file" id="fileElem" name="image" accept="image/*" style="display: none;" onchange="handleFiles(this.files)">
+                <label for="fileElem" id="drop-label">
+                    <p>Drag image file here or click to browse from your device</p>
+                </label>
+            </form>
+        </div>
+        <!-- Checkboxes with labels -->
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="classifications" name="classifications">
+                Classifications
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="locations" name="locations">
+                Locations
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="mask" name="mask">
+                Mask
+            </label>
+        </div>
+        <!-- Position the processed image container right after the drop area -->
+        <div id="processed-image-container"></div>
+    </div>
+
+
+/* Reset margins and padding for a consistent start */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif; /* Use a common font stack */
+}
+
+.site-header {
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Adjusted to space-between for better alignment */
+    padding: 10px 20px;
+}
+
+.container-header {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    height: 50px;
+    margin-right: 20px;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+/* Container that holds the main content */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center children horizontally */
+    margin-left: 20px;
+    position: relative; 
+}
+
+/* Infrence API styling */
+.inference-api {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Drop area styling */
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    width: 80%; /* Set a percentage width for responsiveness */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#drop-area .original-image {
+    width: 100%; /* Full width within the drop area */
+    max-width: 200px; /* Set a max width for the image */
+    height: auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#top-left-corner {
+    position: absolute; /* Keep it positioned absolutely within the container */
+    left: 150px; /* Adjust as necessary for spacing from the left edge of the container */
+    top: 230px; /* Increase the top property value to move it below the Inference API text */
+    width: auto; /* Or set a specific width if needed */
+    max-width: 500%; /* This will limit the image width to 30% of the container's width */
+}
+
+#top-left-corner img {
+    width: 100%; /* This will make the image take up 100% of the #top-left-corner width */
+    height: auto; /* This will maintain the image's aspect ratio */
+}
+
+.container {
+    position: relative; /* This makes the absolute positioning of children relative to this container */
+    /* Other styles remain unchanged */
+}
+
+.site-header {
+    position: relative; /* Needed for z-index to take effect */
+    z-index: 10; /* Higher than the z-index (if any) of #top-left-corner */
+}
+
+/* Style for checkboxes */
+.options {
+    display: flex;
+    justify-content: center; /* Center checkbox options */
+    gap: 20px; /* Add space between options */
+}
+
+#processed-image-container {
+    width: 35%; /* Adjust width as needed */
+    margin-top: 40px; /* Space from the drop area */
+    text-align: left; /* Align the image to the left within the container */
+    display: flex; /* Use flexbox to align content */
+    justify-content: flex-start; /* Align children to the start of the container */
+    align-items: flex-start; /* Ensure items align to the top, removing any centering */
+    padding-left: 0; /* Remove any padding that might push content towards the center */
+    overflow: hidden; /* Ensures that no overflow content affects layout */
+}
+
+.uploaded-image {
+    max-width: 100%; /* This ensures the image is responsive and fits within its container */
+    height: auto; /* This maintains the aspect ratio */
+    margin-right: auto; /* Pushes the image to the left if there's extra space in the container */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .site-header {
+        justify-content: center; /* Center items in the header */
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    #drop-area {
+        width: 90%;
+    }
+
+    .options {
+        flex-direction: column; /* Stack options vertically on smaller screens */
+        align-items: center; /* Center align items */
+    }
+}
+
+/* Additional highlight class for drag over */
+.highlight {
+    border-color: blue;
+}

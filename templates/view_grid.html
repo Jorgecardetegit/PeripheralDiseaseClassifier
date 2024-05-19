@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Cells Grid</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Grid of Extracted Cells</h1>
+        </div>
+    </header>
+    <div class="container">
+        <img src="{{ grid_image_url }}" alt="Grid of Extracted Cells">
+    </div>
+</body>
+</html>
