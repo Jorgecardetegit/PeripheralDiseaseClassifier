@@ -44,5 +44,3 @@ def load_image_from_file(file_stream):
     return img
 
 
-
-

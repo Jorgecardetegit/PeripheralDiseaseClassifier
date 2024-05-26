@@ -6,7 +6,7 @@ class cellExtractor(Extractor):
         self.name = "cellExtractor"
         self.fixed_size = 300
 
-    def extract_cells(self, image, bounding_boxes, classifications, fixed_size=300):
+    def extract_cells(self, image, bounding_boxes, classifications):
         extracted_images = []
 
         for (x, y, w, h), classification in zip(bounding_boxes, classifications):
@@ -24,4 +24,3 @@ class cellExtractor(Extractor):
                     extracted_images.append((cropped_image, classification, (start_x, start_y, end_x, end_y, center_x, center_y)))
 
         return extracted_images
-    

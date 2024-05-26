@@ -6,7 +6,7 @@ import torch
 
 class CellImageProcessor:
     def __init__(self, model, image, red_weight=0.05, green_weight=0.05, blue_weight=0.900,
-                 enhancement_factor=1.5, purple_threshold=200, threshold_value=30):
+                 enhancement_factor=1.5, purple_threshold=200, threshold_value = 50):
         self.model = model
         self.image = image
         self.red_weight = red_weight

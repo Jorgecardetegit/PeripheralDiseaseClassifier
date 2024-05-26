@@ -25,6 +25,9 @@ def save_image_data(image_blob, classification, width, height, x_coord, y_coord,
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         values = (image_blob, classification, width, height, x_coord, y_coord, center_x, center_y, magnification, capture_date)
+
+        print(type(image_blob), type(classification), type(width), type(height), type(x_coord), type(y_coord), type(center_x), type(center_y), type(magnification), type(capture_date))
+
         try:
             cursor.execute(query, values)
             connection.commit()

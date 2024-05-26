@@ -7,8 +7,8 @@ from components.binaryMask.interface import BinaryMasker
 class binaryMaskManager:
     def __init__(self):
         self.maskers: dict[str, BinaryMasker] = {
-            "simple": adaptativeMask(),
-            "custom": simpleMask()
+            "adaptative": adaptativeMask(),
+            "simple": simpleMask()
         }
         self.selected_masker: BinaryMasker = self.maskers["simple"]
     

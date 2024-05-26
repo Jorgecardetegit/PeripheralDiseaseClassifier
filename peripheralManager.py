@@ -39,7 +39,7 @@ class PeripheralManager:
         self.visualizer_manager = VisualizerManager()
 
         """Simple mask parameters"""
-        self.threshold = 50
+        self.threshold = 60
 
         """Localizer parameters"""
         self.offset = 10 
@@ -50,6 +50,15 @@ class PeripheralManager:
 
         """CellExtractor parameters"""
         self.fixed_size=300
+
+        """Selections"""
+        self.set_converter = "simple"
+        self.set_mask = "simple"
+        self.set_localizer = "simple"
+        self.set_sizemasker = "SizeMasker"
+        self.set_extractor = "extractor"
+        self.set_classifier = "ConvNext"
+        self.set_visualizer = "visualizer"
 
     def convert_grayscale(self, 
                           image: np.ndarray, 
@@ -77,12 +86,14 @@ class PeripheralManager:
 
         else: 
             selected_masker = self.mask_manager.selected_masker
+            
 
-        if selected_masker == "simple":
+        if masker != "adaptative":
             return selected_masker.binary_mask(grayscale_image, self.threshold)
         
-        else: 
+        else:
             return selected_masker.binary_mask(grayscale_image)
+        
     
     def cell_localizers(self, 
                         binary_image, 
@@ -127,11 +138,13 @@ class PeripheralManager:
 
         return selected_classifier.classify_cells(image, filtered_locations)
     
-    def visualizer(self, 
+    def main_visualizer(self, 
                    image: np.ndarray, 
+                   binary_mask: np.ndarray,
                    bounding_boxes: dict[str, SizeMask], 
                    classifications: Tuple[List[int], List[List[Tuple[int, float]]]],  
-                   visualizer: str
+                   visualizer: str,
+                   type: str
                    ) -> dict[str, Visualizer]:
         
         visualizer = self.visualizer_manager.set_visualizer(visualizer)
@@ -140,8 +153,18 @@ class PeripheralManager:
         
         else:
             selected_visualizer = self.visualizer_manager.selected_visualizer
-
-        return selected_visualizer
+        
+        if type == "everything": 
+            return selected_visualizer.visualize(image, bounding_boxes, classifications)
+        
+        elif type == "mask": 
+            return selected_visualizer.visualize_mask(image, binary_mask)
+        
+        elif type == "boxes": 
+            return selected_visualizer.visualize_bounding_boxes(image, bounding_boxes, classifications)
+        
+        elif type == "visualizations": 
+            return selected_visualizer.visualize_classifications(image, bounding_boxes, classifications)
         
     def cellExtractor(self, 
                       image: np.ndarray, 
@@ -159,53 +182,36 @@ class PeripheralManager:
 
         return selected_extractor.extract_cells(image, filtered_locations, classifications)
     
+    def main_processor(self, 
+             image: np.ndarray):
+        
+        grayscale_image = self.convert_grayscale(image, self.set_converter)
 
-def main():
+        binary_mask = self.binary_mask(grayscale_image, self.set_mask)
 
-    manager = PeripheralManager()
-    image = plt.imread(r"C:\Users\JCardeteLl\Documents\TFG\Bases_de_datos\images-x60 - reales (fundacion)\Linfocitos normales\image004.jpg")
-    converter = "simp"
-    mask = "simple"
-    localizer = "simple"
-    sizemasker = "SizeMasker"
-    extractor = "extractor"
-    classifier = "ConvNext"
-    visualizer = "visualizer"
+        locations = self.cell_localizers(binary_mask, self.set_localizer)
 
-    plt.imshow(image)
-    plt.show()
+        filtered_locations = self.size_mask(locations, self.set_sizemasker)
 
-    grayscale_image = manager.convert_grayscale(image, converter)
+        classifications = self.classification(image, filtered_locations, self.set_classifier)
 
-    plt.imshow(grayscale_image, cmap="gray")
-    plt.show()
-
-    binary_mask = manager.binary_mask(grayscale_image, mask)
-
-    plt.imshow(binary_mask, cmap="gray")
-    plt.show()
-
-
-    locations = manager.cell_localizers(binary_mask, localizer)
-    print(locations)
-    msg.info(f"Number of cells found: {len(locations)}")
-
-    filtered_locations = manager.size_mask(locations, sizemasker)
-    print(filtered_locations)
-    msg.info(f"Number of cells found after size mask: {len(filtered_locations)}")
+        return grayscale_image, binary_mask, filtered_locations, classifications 
     
-    classifications = manager.classification(image, filtered_locations, classifier)
-    msg.info(f"Made {len(classifications)} classifications")
-    print(classifications)
+    def cell_visualizer(self, 
+                        image: np.ndarray, 
+                        binary_mask: np.ndarray,
+                        filtered_locations, 
+                        classifications, 
+                        set_visualizer): 
+        
+        eveything_image = self.main_visualizer(image, binary_mask, filtered_locations, classifications, "visualizer", "everything")
 
-    visualizer = manager.visualizer(image, filtered_locations, classifications, visualizer)
-    print(visualizer)
+        binary_mask = self.main_visualizer(image, binary_mask, filtered_locations, classifications,"visualizer", "mask")
 
-    objects= manager.cellExtractor(image, filtered_locations, classifications, extractor)
-    for line in objects:
-        print(line)
+        boxes = self.main_visualizer(image, binary_mask, filtered_locations, classifications, "visualizer", "boxes")
 
-if __name__ == "__main__":
-    main()
+        visualizations = self.main_visualizer(image, binary_mask, filtered_locations, classifications, "visualizer", "visualizations")
 
+        return eveything_image, binary_mask, boxes, visualizations 
+    
     
