@@ -7,9 +7,8 @@ class BinaryMasker(ABC):
         super().__init__()
         
     @abstractmethod
-    def binaryMask(self,
-                   grayscale_image
-                   ) -> np.ndarray:
+    def binary_mask(self,
+                   grayscale_image) -> np.ndarray:
         pass
 
 

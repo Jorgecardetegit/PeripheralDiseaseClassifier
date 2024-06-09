@@ -19,6 +19,7 @@ from components.CellClassifier.interface import Classifier
 from components.CellVisualizer.manager import VisualizerManager
 from components.CellVisualizer.interface import Visualizer
 
+
 from wasabi import msg
 import cv2
 import numpy as np
@@ -53,7 +54,7 @@ class PeripheralManager:
 
         """Selections"""
         self.set_converter = "simple"
-        self.set_mask = "simple"
+        self.set_mask = "adaptative"
         self.set_localizer = "simple"
         self.set_sizemasker = "SizeMasker"
         self.set_extractor = "extractor"
@@ -87,8 +88,7 @@ class PeripheralManager:
         else: 
             selected_masker = self.mask_manager.selected_masker
             
-
-        if masker != "adaptative":
+        if masker == "simple":
             return selected_masker.binary_mask(grayscale_image, self.threshold)
         
         else:
@@ -166,7 +166,7 @@ class PeripheralManager:
         elif type == "visualizations": 
             return selected_visualizer.visualize_classifications(image, bounding_boxes, classifications)
         
-    def cellExtractor(self, 
+    def cellExtractor(self,
                       image: np.ndarray, 
                       filtered_locations: dict[str, SizeMask],
                       classifications: Tuple[List[int], List[List[Tuple[int, float]]]], 
@@ -181,7 +181,7 @@ class PeripheralManager:
             selected_extractor = self.cellExtractor_manager.selected_extractor
 
         return selected_extractor.extract_cells(image, filtered_locations, classifications)
-    
+
     def main_processor(self, 
              image: np.ndarray):
         
