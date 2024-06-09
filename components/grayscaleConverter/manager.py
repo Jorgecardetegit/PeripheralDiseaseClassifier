@@ -15,7 +15,6 @@ class grayscaleConverterManager:
     def set_converter(self, converter: str) -> bool:
         if converter in self.converters:
             self.selected_converter = self.converters[converter]
-            msg.info(f"Grayscale converter {converter} selected")
             return True
         else:
             msg.warn(f"Grayscale converte {converter} not found")
